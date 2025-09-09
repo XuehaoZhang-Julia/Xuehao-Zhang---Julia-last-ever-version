@@ -1,0 +1,28 @@
+name: Docs
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+
+permissions:
+  contents: write    # needed for gh-pages
+  pages: write
+  id-token: write
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: "1.11"
+
+      - name: Instantiate docs env
+        run: julia --project=docs -e 'using Pkg; Pkg.instantiate()'
+
+      - name: Build and deploy docs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: julia --project=docs docs/make.jl
