@@ -1,7 +1,6 @@
 using Documenter
 using BeijingPM25Prediction
 
-# Make the package available in doctests
 DocMeta.setdocmeta!(BeijingPM25Prediction, :DocTestSetup, :(using BeijingPM25Prediction); recursive=true)
 
 makedocs(
@@ -12,11 +11,10 @@ makedocs(
         "Home" => "index.md",
         "API"  => "api.md",
     ],
-    # Unblock CI immediately; turn into an error later by removing this line
-    warnonly = [:missing_docs],
+    warnonly = [:missing_docs],   # avoids CI failing if something is undocumented
 )
 
 deploydocs(
-    repo      = "github.com/XuehaoZhang-Julia/BeijingPM25Prediction.jl.git",
-    devbranch = "main",   # or "master" if that's your default
+    repo      = "github.com/<yourusername>/BeijingPM25Prediction.jl.git",
+    devbranch = "main",
 )
