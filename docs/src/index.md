@@ -1,7 +1,13 @@
 # BeijingPM25Prediction.jl
 
-Welcome to the documentation for **BeijingPM25Prediction.jl**, a Julia package for predicting Beijing PM2.5 concentrations using Neural ODEs.
+Welcome! This package predicts Beijing PM2.5 concentrations using a Neural ODE–style surrogate.
 
-```@autodocs
-Modules = [BeijingPM25Prediction]
+## API
+
+```@docs
+BeijingPM25Prediction.run_pm25_experiment
+BeijingPM25Prediction.plot_predictions
+BeijingPM25Prediction.analyze_results
+BeijingPM25Prediction.generate_summary_plots
+
 
