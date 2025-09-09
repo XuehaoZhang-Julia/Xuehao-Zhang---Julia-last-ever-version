@@ -1,0 +1,30 @@
+name: CI
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: '1.11'   # match your Manifest/compat
+
+      - uses: julia-actions/cache@v1
+
+      - name: Instantiate
+        run: julia --color=yes -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
+
+      - name: Run tests (headless)
+        env:
+          GKSwstype: "100"
+        run: julia --project --color=yes -e 'using Pkg; Pkg.test()'
+
+      - name: Process coverage
+        if: runner.os == 'Linux'
+        uses: julia-actions/julia-processcoverage@v1
