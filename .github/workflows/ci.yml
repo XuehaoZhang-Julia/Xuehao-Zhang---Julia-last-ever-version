@@ -8,6 +8,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      # (optional) if the pkg server ever misbehaves, uncomment to bypass:
+      # JULIA_PKG_SERVER: ""
     steps:
       - uses: actions/checkout@v4
 
@@ -16,23 +19,28 @@ jobs:
           version: '1.11'
 
       - uses: julia-actions/cache@v1
-      - name: Resolve & instantiate (project)
+
+      - name: Ensure General registry
         run: |
-          julia --project=. --color=yes -e '
+          julia -e '
             using Pkg;
-            # ensure General registry is present & fresh
             try
               Pkg.Registry.add(Pkg.RegistrySpec(url="https://github.com/JuliaRegistries/General.git"))
             catch
-              # ignore if already added
+              # ignore if already present
             end
             Pkg.Registry.update();
-            Pkg.resolve();
-            Pkg.instantiate();
-            Pkg.precompile();
+            println("Registries after update:");
+            for r in values(Pkg.Registry.reachable_registries())
+              println(" - ", r.name, " @ ", r.path)
+            end
           '
 
-      - name: Pkg. status (debug)
+      - name: Resolve & instantiate (project)
+        run: |
+          julia --project=. --color=yes -e 'using Pkg; Pkg.resolve(); Pkg.instantiate(); Pkg.precompile()'
+
+      - name: Pkg.status (debug)
         run: |
           julia --project=. -e 'using Pkg; println("Active project: ", Base.active_project()); Pkg.status()'
 
