@@ -16,10 +16,22 @@ jobs:
           version: "1.11"
 
       - uses: julia-actions/cache@v1
-
+      
       - name: Ensure General registry
         run: |
-          julia -e 'using Pkg; try Pkg.Registry.add(Pkg.RegistrySpec(url="https://github.com/JuliaRegistries/General.git")) catch end; Pkg.Registry.update(); println("Registries after update:"); for r in values(Pkg.Registry.reachable_registries()) println(" - ", r.name, " @ ", r.path) end'
+          julia --project=. -e '
+            using Pkg;
+            try
+              Pkg.Registry.add(Pkg.RegistrySpec(url="https://github.com/JuliaRegistries/General.git"))
+            catch
+              # ignore if already present
+            end
+            Pkg.Registry.update();
+            println("Registries after update:");
+            for r in values(Pkg.Registry.reachable_registries())
+              println(" - ", r.name, " @ ", r.path)
+            end
+          '
 
       - name: Resolve & instantiate (project)
         run: |
