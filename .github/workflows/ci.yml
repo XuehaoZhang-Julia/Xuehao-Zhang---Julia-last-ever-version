@@ -16,10 +16,21 @@ jobs:
           version: '1.11'
 
       - uses: julia-actions/cache@v1
-
       - name: Resolve & instantiate (project)
         run: |
-          julia --project=. --color=yes -e 'using Pkg; Pkg.resolve(); Pkg.instantiate(); Pkg.precompile()'
+          julia --project=. --color=yes -e '
+            using Pkg;
+            # ensure General registry is present & fresh
+            try
+              Pkg.Registry.add(Pkg.RegistrySpec(url="https://github.com/JuliaRegistries/General.git"))
+            catch
+              # ignore if already added
+            end
+            Pkg.Registry.update();
+            Pkg.resolve();
+            Pkg.instantiate();
+            Pkg.precompile();
+          '
 
       - name: Pkg. status (debug)
         run: |
