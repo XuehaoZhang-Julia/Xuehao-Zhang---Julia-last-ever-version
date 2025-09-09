@@ -1,13 +1,9 @@
 # BeijingPM25Prediction.jl
 
-Welcome! This package predicts Beijing PM2.5 concentrations using a Neural ODE–style surrogate.
+This package predicts Beijing PM2.5 concentrations using a Neural ODE–style surrogate model.
 
-## API
+- Multi-horizon forecasts (1h, 24h, 168h)
+- Metrics: MAE, RMSE, R²
+- Automatic plot generation
 
-```@docs
-BeijingPM25Prediction.run_pm25_experiment
-BeijingPM25Prediction.plot_predictions
-BeijingPM25Prediction.analyze_results
-BeijingPM25Prediction.generate_summary_plots
-
-
+See the **API** page for full documentation of functions.
