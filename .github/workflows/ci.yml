@@ -1,45 +1,57 @@
 name: CI
-
 on:
   push:
-    branches: [ main, master ]
+    branches: [ "main", "master" ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ "main", "master" ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      # If the pkg server flakes, set this to "" to bypass it and fetch via git:
-      # JULIA_PKG_SERVER: ""
-      JULIA_NUM_THREADS: 2
+    # If the Julia pkg server misbehaves, uncomment the next two lines to bypass it:
+    # env:
+    #   JULIA_PKG_SERVER: ""
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: julia-actions/setup-julia@v2
         with:
-          version: '1.11'   # or '1' to track latest stable
+          version: "1.11"
 
       - uses: julia-actions/cache@v1
 
-      # (Optional) Print registries to help debug missing/old registries
-      - name: Show registries
-        run: julia --color=yes -e 'using Pkg; Pkg.Registry.status()'
-
-      # Ensure General is present & up-to-date, then resolve/instantiate/precompile
-      - name: Instantiate project
+      # Ensure the General registry exists before resolving deps
+      - name: Ensure General registry
         run: |
-          julia --project=. --color=yes -e '
-            using Pkg
+          julia --project=. -e '
+            using Pkg;
             try
               Pkg.Registry.add(Pkg.RegistrySpec(url="https://github.com/JuliaRegistries/General.git"))
-            catch e
-              @info "Registry add skipped (likely already present)" exception=e
+            catch
+              # already present; ignore
             end
-            Pkg.Registry.update()
-            Pkg.resolve(); Pkg.instantiate(); Pkg.precompile()
+            Pkg.Registry.update();
+            println("Registries after update:");
+            for r in values(Pkg.Registry.reachable_registries())
+              println(" - ", r.name, " @ ", r.path)
+            end
           '
 
-      # Run your tests
-      - name: Run tests
-        run: julia --project=. --color=yes -e 'using Pkg; Pkg.test(; coverage=true)'
+      - name: Resolve & instantiate (project)
+        run: |
+          julia --project=. --color=yes -e 'using Pkg; Pkg.resolve(); Pkg.instantiate(); Pkg.precompile()'
+
+      - name: Pkg.status (debug)
+        run: |
+          julia --project=. -e 'using Pkg; println("Active project: ", Base.active_project()); Pkg.status()'
+
+      - name: Run tests (headless)
+        env:
+          GKSwstype: "100"   # headless GR for Plots
+        run: |
+          julia --project=. --color=yes -e 'using Pkg; Pkg.test()'
+
+      - name: Process coverage
+        if: runner.os == 'Linux'
+        uses: julia-actions/julia-processcoverage@v1
