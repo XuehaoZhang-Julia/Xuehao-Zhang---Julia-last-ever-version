@@ -5,7 +5,7 @@ on:
   pull_request:
 
 permissions:
-  contents: write    # needed for gh-pages
+  contents: write   # needed to push gh-pages
   pages: write
   id-token: write
 
@@ -19,10 +19,12 @@ jobs:
         with:
           version: "1.11"
 
-      - name: Instantiate docs env
-        run: julia --project=docs -e 'using Pkg; Pkg.instantiate()'
+      - name: Prepare docs environment
+        run: |
+          julia --project=docs -e 'using Pkg; Pkg.develop(PackageSpec(path=".")); Pkg.instantiate()'
 
-      - name: Build and deploy docs
+      - name: Build & deploy docs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: julia --project=docs docs/make.jl
+        run: |
+          julia --project=docs docs/make.jl
