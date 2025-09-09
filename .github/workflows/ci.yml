@@ -42,7 +42,7 @@ jobs:
         run: |
           julia --project=. --color=yes -e 'using Pkg; Pkg.resolve(); Pkg.instantiate(); Pkg.precompile()'
 
-      - name: Pkg.status (debug)
+      - name: Pkg. status (debug)
         run: |
           julia --project=. -e 'using Pkg; println("Active project: ", Base.active_project()); Pkg.status()'
 
