@@ -1,1 +1,8 @@
+# API Reference
+
+```@docs
+BeijingPM25Prediction.run_pm25_experiment
+BeijingPM25Prediction.plot_predictions
+BeijingPM25Prediction.analyze_results
+BeijingPM25Prediction.generate_summary_plots
 
