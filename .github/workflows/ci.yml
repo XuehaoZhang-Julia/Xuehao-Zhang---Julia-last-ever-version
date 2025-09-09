@@ -13,18 +13,20 @@ jobs:
 
       - uses: julia-actions/setup-julia@v2
         with:
-          version: '1.11'   # match your Manifest/compat
+          version: '1.11'
 
       - uses: julia-actions/cache@v1
 
-      - name: Resolve & instantiate
-        run: julia --color=yes -e 'using Pkg; Pkg.resolve(); Pkg.instantiate(); Pkg.precompile()'
+      - name: Resolve & instantiate (project)
+        run: julia --project=. --color=yes -e 'using Pkg; Pkg.resolve(); Pkg.instantiate(); Pkg.precompile()'
 
+      - name: Pkg.status (debug)
+        run: julia --project=. -e 'using Pkg; println("Active project: ", Pkg.project().path); Pkg.status()'
 
       - name: Run tests (headless)
         env:
           GKSwstype: "100"
-        run: julia --project --color=yes -e 'using Pkg; Pkg.test()'
+        run: julia --project=. --color=yes -e 'using Pkg; Pkg.test()'
 
       - name: Process coverage
         if: runner.os == 'Linux'
