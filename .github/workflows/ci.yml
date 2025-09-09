@@ -18,15 +18,18 @@ jobs:
       - uses: julia-actions/cache@v1
 
       - name: Resolve & instantiate (project)
-        run: julia --project=. --color=yes -e 'using Pkg; Pkg.resolve(); Pkg.instantiate(); Pkg.precompile()'
+        run: |
+          julia --project=. --color=yes -e 'using Pkg; Pkg.resolve(); Pkg.instantiate(); Pkg.precompile()'
 
-      - name: Pkg.status (debug)
-        run: julia --project=. -e 'using Pkg; println("Active project: ", Pkg.project().path); Pkg.status()'
+      - name: Pkg. status (debug)
+        run: |
+          julia --project=. -e 'using Pkg; println("Active project: ", Base.active_project()); Pkg.status()'
 
       - name: Run tests (headless)
         env:
           GKSwstype: "100"
-        run: julia --project=. --color=yes -e 'using Pkg; Pkg.test()'
+        run: |
+          julia --project=. --color=yes -e 'using Pkg; Pkg.test()'
 
       - name: Process coverage
         if: runner.os == 'Linux'
